@@ -1,0 +1,70 @@
+#!/bin/bash
+dom=${1?need host}
+op=${2:up}
+
+virsh list --name 2>/dev/null | grep -q ${dom} >/dev/null 2>&1 && virsh shutdown --domain ${dom}
+let i=0
+while :;do
+  sleep 1
+  let i=$i+1
+  if virsh domstate ${dom} 2>/dev/null | grep -q "shut off" >/dev/null;then
+    virsh undefine --domain ${dom}
+    break
+  fi
+  if (( $i > 10 ));then
+    echo "Failed to delete"
+    exit 1
+  fi
+done
+
+virsh vol-list --pool tmp | grep -c disk-${dom}.img >/dev/null 2>&1 && virsh vol-delete --pool tmp disk-${dom}.img
+virsh vol-list --pool tmp | grep -c seed-${dom}.img >/dev/null 2>&1 && virsh vol-delete --pool tmp seed-${dom}.img
+
+if [[ "$op" == "-u" ]];then
+
+  sleep 3
+
+  sed -i -r "s/^hostname: .*/hostname: $dom/" cloudinit/config.yaml
+  cloud-init devel make-mime -a cloudinit/config.yaml:cloud-config -a cloudinit/script.sh:x-shellscript > /tmp/user-data
+  sudo cloud-localds -v /tmp/seed-${dom}.img /tmp/user-data
+  cp ubuntu.img /tmp/disk-${dom}.img
+
+  virt-install \
+    --name ${dom} \
+    --virt-type kvm \
+    --memory 768 \
+    --vcpus 1 \
+    --boot hd,menu=on \
+    --disk path=/tmp/disk-${dom}.img,device=disk,format=qcow2 \
+    --cdrom /tmp/seed-${dom}.img \
+    --os-type Linux \
+    --os-variant ubuntu20.04 \
+    --network network:default \
+    --console pty,target_type=serial &
+
+  let i=0
+  while :;do
+    sleep 1
+    let i=$i+1
+    virsh list --name 2>/dev/null | grep -q ${dom} >/dev/null && break
+    if (( $i > 10 ));then
+      echo "Failed to start"
+      exit 1
+    fi
+  done
+    
+  echo
+  mac="$(virsh dumpxml ${dom} | grep "mac address" | awk -F\' '{print $2}')"
+  echo "mac is $mac"
+  let i==0
+  while :;do
+    ip="$(arp -n | grep "$mac" | cut -d' ' -f1)"
+    if [[ "$ip" != "" ]] || (( $i > 30 ));then
+      break
+    fi
+    let i=$i+1
+    sleep 1
+  done
+  echo " ip is $ip"
+
+fi

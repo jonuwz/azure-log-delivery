@@ -1,0 +1,4 @@
+ubuntu.img
+terraform/.terraform*
+terraform/.terraform/**
+**/*.tfstate
