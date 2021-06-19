@@ -1,8 +1,4 @@
 #!/bin/bash
-mkdir -p /opt/td-agent-bit/scripts
-mv /tmp/append_tag.lua /opt/td-agent-bit/scripts/append_tag.lua
-mv /tmp/td-agent-bit.service /lib/systemd/system/td-agent-bit.service
-
 if [[ "$(cloud-init query --format '{{ v1.platform }}')" == "nocloud" ]];then
 echo -e "\n192.168.122.1 kafkaext" >> /etc/hosts
 
@@ -18,6 +14,7 @@ cat <<'EOF' >> /etc/td-agent-bit/parsers.conf
 EOF
 
 cat <<'EOF' > /etc/td-agent-bit/td-agent-bit.conf
+@SET OU=makerun
 [SERVICE]
     flush        5
     daemon       Off
@@ -51,5 +48,4 @@ nohup bash -c 'while :;do echo $(date +%FT%T.%3N%z) this is a test;sleep 0.1;don
 
 fi
 
-systemctl daemon-reload
 service td-agent-bit restart 

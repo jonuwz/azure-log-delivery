@@ -1,7 +1,15 @@
-data "template_file" "script" {
+data "template_file" "config" {
   template = file("../cloudinit/config_azure.yaml")
+  vars = {
+    eventhubNS = "${azurerm_eventhub_namespace.tfEventhubNS.name}"
+    eventhub  = "${azurerm_eventhub.tfEventhub.name}"
+    connectionString = "${azurerm_eventhub_authorization_rule.tfEventhubAuthRule.primary_connection_string}"
+  }
 }
 
+data "template_file" "script" {
+  template = file("../cloudinit/script_azure.sh")
+}
 
 data "template_cloudinit_config" "config" {
   gzip          = true
@@ -10,6 +18,11 @@ data "template_cloudinit_config" "config" {
   # Main cloud-config configuration file.
   part {
     content_type = "text/cloud-config"
+    content = "${data.template_file.config.rendered}"
+  }
+
+  part {
+    content_type = "text/x-shellscript"
     content = "${data.template_file.script.rendered}"
   }
 }
@@ -37,6 +50,31 @@ resource "azurerm_resource_group" "tfgroup" {
     tags = {
         environment = "tf"
     }
+}
+
+resource "azurerm_eventhub_namespace" "tfEventhubNS" {
+  name                = "myEventhubNS1"
+  location            = "eastus2"
+  resource_group_name = azurerm_resource_group.tfgroup.name
+  sku                 = "standard"
+}
+
+resource "azurerm_eventhub" "tfEventhub" {
+  name                = "app_tf"
+  namespace_name      = azurerm_eventhub_namespace.tfEventhubNS.name
+  resource_group_name = azurerm_resource_group.tfgroup.name
+  partition_count     = 16
+  message_retention   = 1
+}
+
+resource "azurerm_eventhub_authorization_rule" "tfEventhubAuthRule" {
+  name                = "tfEventhubClientSend"
+  namespace_name      = azurerm_eventhub_namespace.tfEventhubNS.name
+  eventhub_name       = azurerm_eventhub.tfEventhub.name
+  resource_group_name = azurerm_resource_group.tfgroup.name
+  listen              = false
+  send                = true
+  manage              = false
 }
 
 # Create virtual network
@@ -134,8 +172,8 @@ resource "azurerm_linux_virtual_machine" "tfvm" {
 
     source_image_reference {
         publisher = "Canonical"
-        offer     = "UbuntuServer"
-        sku       = "18.04-LTS"
+        offer     = "0001-com-ubuntu-server-focal"
+        sku       = "20_04-lts"
         version   = "latest"
     }
 
@@ -153,4 +191,13 @@ resource "azurerm_linux_virtual_machine" "tfvm" {
     tags = {
         environment = "tf"
     }
+}
+
+output "EVENTHUB_CONNECTION_STRING" {
+  value = "${azurerm_eventhub_namespace.tfEventhubNS.default_primary_connection_string}"
+  sensitive = true
+}
+
+output "EVENTHUB_LOCATION" {
+  value = "${azurerm_eventhub_namespace.tfEventhubNS.name}.servicebus.windows.net:9093"
 }

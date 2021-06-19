@@ -1,0 +1,2 @@
+#!/bin/bash
+terraform show -json | jq -r '.values.outputs | to_entries[] | [ .key, .value.value ] | @tsv' | awk 'BEGIN{printf "\n"}{printf("%-32s %s\n",$1,$2)}END{printf "\n"}'

@@ -2,20 +2,22 @@
 dom=${1?need host}
 op=${2:up}
 
-virsh list --name 2>/dev/null | grep -q ${dom} >/dev/null 2>&1 && virsh shutdown --domain ${dom}
-let i=0
-while :;do
-  sleep 1
-  let i=$i+1
-  if virsh domstate ${dom} 2>/dev/null | grep -q "shut off" >/dev/null;then
-    virsh undefine --domain ${dom}
-    break
-  fi
-  if (( $i > 10 ));then
-    echo "Failed to delete"
-    exit 1
-  fi
-done
+if virsh list --name 2>/dev/null | grep -q ${dom} >/dev/null 2>&1;then
+  virsh shutdown --domain ${dom}
+  let i=0
+  while :;do
+    sleep 1
+    let i=$i+1
+    if virsh domstate ${dom} 2>/dev/null | grep -q "shut off" >/dev/null;then
+      virsh undefine --domain ${dom}
+      break
+    fi
+    if (( $i > 10 ));then
+      echo "Failed to delete"
+      exit 1
+    fi
+  done
+fi
 
 virsh vol-list --pool tmp | grep -c disk-${dom}.img >/dev/null 2>&1 && virsh vol-delete --pool tmp disk-${dom}.img
 virsh vol-list --pool tmp | grep -c seed-${dom}.img >/dev/null 2>&1 && virsh vol-delete --pool tmp seed-${dom}.img

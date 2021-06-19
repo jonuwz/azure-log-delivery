@@ -1,4 +1,8 @@
 #cloud-config
+bootcmd:
+  - "mkdir -p /etc/td-agent-bit/conf.d"
+  - "mkdir -p /opt/td-agent-bit/scripts"
+
 apt:
   sources:
     fluent-bit.list:
@@ -39,12 +43,7 @@ packages:
   - td-agent-bit
 
 write_files:
-  - path: /etc/identity
-    content: |
-      OU=makerun
-    permissions: '0644'
-    owner: 'root:root'
-  - path: /tmp/append_tag.lua
+  - path: /opt/td-agent-bit/scripts/append_tag.lua
     content: |
       function append_tag(tag, timestamp, record)
           new_record = record
@@ -53,21 +52,46 @@ write_files:
       end
     permissions: '0755'
     owner: 'root:root'
-  - path: /tmp/td-agent-bit.service
+  - path: /etc/td-agent-bit/my.conf
     content: |
-      [Unit]
-      Description=TD Agent Bit
-      Requires=network.target
-      After=network.target
-        
-      [Service]
-      Type=simple
-      EnvironmentFile=/etc/identity
-      ExecStart=/opt/td-agent-bit/bin/td-agent-bit -c /etc/td-agent-bit/td-agent-bit.conf
-      Restart=always
-        
-      [Install]
-      WantedBy=multi-user.target
-    permissions: '0755'
+      @SET OU=makerun
+      [SERVICE]
+          flush           5
+          daemon          Off
+          log_level       info
+          parsers_file    parsers.conf
+          plugins_file    plugins.conf
+          http_server     Off
+          http_listen     0.0.0.0
+          http_port       2020
+          storage.metrics on
+      [INPUT]
+          name     tail
+          parser   isotimestamp-singleline
+          tag      app.sourcetype
+          path     /tmp/test.log
+          db       /tmp/fluentbit.db
+          path_key source
+      [FILTER]
+          name  rewrite_tag
+          match app.*
+          rule  $source ^(.*)$ out.app.$${OU}.$TAG[1].$${HOSTNAME} false
+      [FILTER]
+          name   lua
+          match  out.*
+          script /opt/td-agent-bit/scripts/append_tag.lua
+          call   append_tag
+      [OUTPUT]
+          name                          kafka
+          match                         out.*
+          brokers                       ${eventhubNS}.servicebus.windows.net:9093
+          topics                        ${eventhub}
+          rdkafka.security.protocol     SASL_SSL
+          rdkafka.sasl.mechanism        PLAIN
+          rdkafka.sasl.username         $ConnectionString
+          rdkafka.sasl.password         ${connectionString}
+          rdkafka.request.required.acks 1
+          rdkafka.log.connection.close  false
+          rdkafka.compression.codec     none
+    permissions: '0640'
     owner: 'root:root'
-
