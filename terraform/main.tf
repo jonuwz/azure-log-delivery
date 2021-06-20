@@ -7,6 +7,14 @@ data "template_file" "config" {
   }
 }
 
+data "template_file" "fluent_config" {
+  template = file("../local/fluent.conf.tpl")
+  vars = {
+    eventhubNS = "${azurerm_eventhub_namespace.tfEventhubNS.name}"
+    connectionString = "${azurerm_eventhub_authorization_rule.tfEventhubAuthRule.primary_connection_string}"
+  }
+}
+
 data "template_file" "script" {
   template = file("../cloudinit/script_azure.sh")
 }
@@ -53,7 +61,7 @@ resource "azurerm_resource_group" "tfgroup" {
 }
 
 resource "azurerm_eventhub_namespace" "tfEventhubNS" {
-  name                = "myEventhubNS1"
+  name                = "myEventhubNS2"
   location            = "eastus2"
   resource_group_name = azurerm_resource_group.tfgroup.name
   sku                 = "standard"
@@ -200,4 +208,9 @@ output "EVENTHUB_CONNECTION_STRING" {
 
 output "EVENTHUB_LOCATION" {
   value = "${azurerm_eventhub_namespace.tfEventhubNS.name}.servicebus.windows.net:9093"
+}
+
+resource "local_file" "fluent_conf" {
+  content = "${data.template_file.fluent_config.rendered}"
+  filename = "../local/fluent.conf"
 }

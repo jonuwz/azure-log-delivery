@@ -1,70 +1,67 @@
 #cloud-config
 bootcmd:
-  - "mkdir -p /etc/td-agent-bit/conf.d"
-  - "mkdir -p /opt/td-agent-bit/scripts"
+  - "mkdir -p /etc/fluent-bit/{parsers.d,inputs.d,outputs.d}"
 
 apt:
   sources:
     fluent-bit.list:
-      source: "deb https://packages.fluentbit.io/ubuntu/focal focal main"
+      source: "deb https://make.run/repo/ubuntu focal main"
       key: |
         -----BEGIN PGP PUBLIC KEY BLOCK-----
-        Version: GnuPG v1
         
-        mQENBFXlAtMBCAC7SievUBw7WTm9yWCp+Wfo28w7A7ERVJpZp3sTw5Wn+gISHA+1
-        iCkfG0UDDo0smWQb+zZ6spd2OV2zg/TTgSjZb0JJiCeIrzFtWctkm8zS7X7g3t+0
-        a92IYYL/yA9x2RP7DaszqqT90GIoMZ18Iu1qwe651rOhAtNCrcmw5lsa+rrHDUVH
-        tIH2EH/71akkxnlLB9jFknQ+8nDAkX2btByG0KYr+i7a2FmSFo+CKYZewauanriU
-        cPTQHHFmapKyEDLbE1DlTku+9IqhxakwTyUn9bCnhUMWEzqmpfZWS/FzcclBIsWC
-        SFZv4LLNbYMaIX2jwGI7umUuQ4GttDZS/6+fABEBAAG0KUVkdWFyZG8gU2lsdmEg
-        PGVkdWFyZG9AdHJlYXN1cmUtZGF0YS5jb20+iQE3BBMBCAAhAhsDAh4BAheABQJX
-        fIHPBQsJCAcDBRUKCQgLBRYCAwEAAAoJEE/4NotuoHIqeAwIAIAsyO6sV/W4xUro
-        XzYntfEvjcgVrR1DnZMLN/zkGbgv1AfoRLfOW/9pBDpIJAiifzYBr265zoKf7Wny
-        D99KN7N9NTf1lgzoDFgWdCltvUzKNj0D8xN1cTvUq0tGxpEFBCtbjg3swW68etJx
-        wkFhPXewcgbVk2PYz3AK7PDcR1A3HRZc/hI1GqfxoxYLT6qmXEE9/0ZI7cIvoYjp
-        S66QXnpSHDZ7thROEbQCwIvZh0usVaSa7HGzW6YLwq7Mtk36eRYXMOkl3tRlu3Me
-        KuD0vWrvHIBVU1C5GLSvK+K2O0dx9MgiwbuVegWCZUe56JsTH7THCozvKgcVF3yK
-        Wc6gKlO5AQ0EVeUC0wEIAKyJwOGZOTmh45i29c5gxvFB95lu4ajTa9X1zmaM7Xe3
-        2VhrLyaIp9noWE8xjv2i97wV9LrzrmUSxzhqSE8MG+qPxy6/PCdxe3kLB+PCvutO
-        4EnLy3MnglK6YPSZrxV69nbnO+Ts0dhYWFUqsdE7jwrr6DgED49MUUbzj4y+MPQt
-        ljEr69p4pja4VilgqMDWurnQ8M0tnALJHL4kvcWbSwWSAahhYT7HNvtyiXt3U/Na
-        Dbaw86L8ENTxXkS5YgiQbm8PLVrfoNzw/z37QVYf4izNpVaqek82TBp0A3FVfVd3
-        V7dObzvLDlEEX4kjEbhZYRAK2k74oazE3343ibPwIPUAEQEAAYkBHwQYAQIACQUC
-        VeUC0wIbDAAKCRBP+DaLbqByKm0GCACqMPKFdEdEQnmEJ1cTtwx4ax3HUML3frJW
-        /Kz4DytGpAD6yq7lLT5BRK2X6QNla+jezDSNfsOw9uPMDhV0iXw/hGpt3kr5wp4J
-        UT1LKfkd/0WHgygvLZUobmqkvpqTIKrp5yjAv6WGQpJyTZDcL0D5TsgLr6NC0taJ
-        I41ckHWc9Nd3kTS6oVNLngEVDaQ2AezYpHgXgww6XEb60wGvnj/3P0Cx1gvo+V0c
-        JIs2r6TYHNdrZKfY6ynxS08Is+axvSdUxoUL27CQ+/ljhkGD2qNyieY9feYRGx+A
-        POR1LlqgIS3UH36y9XojJsBF9Qki/3+GG2u//pBiVNSwb6hRtcPF
-        =RrLa
+        mQGNBGDPC2MBDACelS0xUqd4lPHkS/Y21jaHSTklET4Zwya3Vmgy/N5o0fZuzTAk
+        LT5wHJ5XDn2W5RsmVm7bW3IYu3kISvqimHvtOGYuRaKdVzN0k3tAL/7FJ4OtevaI
+        VOFpXWqVdNQNOXHqVb+2WtMnWZJmYO0iqHRQh2OhGrWyU3x7mRV4YT7+5Oxs6BmR
+        HClSiRMSrBPA7L9kqbLD1fm8yVbGQzY1itLE1GQEURvqYmutObS2LPlSvbIXOCLj
+        B/9VlbPs3yqG9K+VZcU0b2azXxe+wgQyPrHBVWdyDQ2vWLhXv+GJZdlnWl35co5T
+        R/0EvWaSu4DWEpAmIV3WyLw+z6D2cCIZ39tWfqZyh1pByl+xpj04CKL+Nj/ULIE7
+        B7Z+4V8ZzR800X4ClsMYQCS3a1YYz5IUwUvbGogHK/R72WVzIvMTFHsmwqaoJl6e
+        /SnkwdZn9AsvvAbTI3MXz7F885U4qy2Q7b5rxA0BkZXB5Ebwhzn54H1GOq0FtATp
+        VsIiCP5pzBjkAEUAEQEAAbQfSm9obiBIdWdoZXMgPHBhY2thZ2VzQG1ha2UucnVu
+        PokB1AQTAQgAPhYhBPFP5zi5NLruHhj7o2i4jDZALGOHBQJgzwtjAhsDBQkDwmcA
+        BQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEGi4jDZALGOHQEIL/36IB41T9sYZ
+        goORI/Bl0T7KPvyYfqqGADafcT/iCbtD00Ck3rFJATsUHmpJRmBuSAoZiYakBkoD
+        Nv/eAPitiY5XdGFC/UjfmWZohKYF9HMk9fK7SMMTQKpkTvZpySXLKmbyyzBdEWg5
+        yZDUP+YWiH3R4lToeT69I1QXqbXfSBsXEl6mr3eBa9h7ynqXLS8AdzCvxsR8XT/w
+        quUOXqD7EGWpX9oILiPgwNJ1n6MGyvoFwaamxUvLs4HEKH1xns9oJPrj9APOplSg
+        IBPXk5l14VznstFLGGne68x5+jYhxZU5JIVOUsiaxyxVPwlFkCtMdPsF5zSPJhfr
+        OnaWNejFS5HeBvzpXOiwUgoW8b3w+DR7Du/wXOrP2W/IN/q7Eb0PGKghBjOPKBvI
+        IrQ8YSMvTUPKe45R2QmxdC5iEgW++LBjs5zVNeVuipWHGizYrpTBvkFGa+l23C7j
+        z69H+RBA9hj+NujVZ1P8THtKuLOdQ1b5JtYvCrDW2RG/Ob7+NwjhkrkBjQRgzwtj
+        AQwA48GJRBIH0QHAaOu7kyIYwBGbxpldehc2WzX9tDuvKDY2msG/jgUfTEh+B6lN
+        Ue2eiNHVFB82/RaKLIf+82G3eLJ6BDGKM9tctosGi1Q9Lok5mey9Vtx4UVRUTfnt
+        I2vGiMdL3M0qXosHzeeTax5PZPt3TfgBdw5cF05YOBjLW27G3sqArKaVdN8oRZi6
+        abPE4ZqiW1GsMcl/cOCG9+NPLswpefwIQ8fp0lfdDPZTwnQH9ruMwIApGgvDbxpd
+        /TMbAOUPSbBeFTzVyo9SIwsfLB1/erXH6lv65xbjjIsX8J6MlGtwBDwpMW6b2Hpr
+        lBICW7xlDPntvZs3gitTqi9if1D/2+0+Qgp8XcjlmEIRhNgXOrIKPtVdPBPfGUyS
+        MJe/zMSk1wZ9v3GwtxOzDIggQXrM9y1/k3qIB9BCCX0EazarFu4/kHMiyjkOgAcT
+        FlwBG66OAsEC6zUX/iRP/BRsDG6448kx+ZoAZXQHZgVGxf0F8T45GURGeSlnO1wL
+        U/IrABEBAAGJAbwEGAEIACYWIQTxT+c4uTS67h4Y+6NouIw2QCxjhwUCYM8LYwIb
+        DAUJA8JnAAAKCRBouIw2QCxjh05bC/sFqa1fzdVDdMdnxZIFRfdvmxz2bWa5WrjB
+        eig0Sqywb5yY8JA6mGq3VWguwu/bOX0HVMq0VGQDISyAX2piHBj8gWk48SDCLboz
+        fnR4lbkfJn3fWCP7pj4kFGKnFETI+eEs0W5V6O851YrBL4fM/2//o4gDgKsFqf1A
+        ooA/Obq6+tMcfQQYDFXpFxMZIHiKc0iO2jbojcOO0HFOwGnOGmSP1UETbzNS4BFS
+        2pedymrkh1ekk6D6eNg87pxgx2oxjP2nwzIyKK/58YX8iRhPPILKiXpte7F82rbz
+        o5zfGEE/FRzc0WeGaPsxoTH+7QQHAfGCYUIv5RmPx4jK/cvn2XwRO/XP3R6KhoCQ
+        on8XxAjvoSOZqQ6K6+Qy3gPhX28ANeVhz2jO3ESmyNAufegg/8rkEvR4OnxohEX3
+        cQq+FvdFHENccCeYd4egsSjj6XAZkVtBNTm15nt9ACgOCA9gwfLakcnCGD1bkDRG
+        EzBHJN8YUC1nTEiHsw0w/zVAG++GypI=
+        =pTm6
         -----END PGP PUBLIC KEY BLOCK-----
-
+        
 packages:
-  - td-agent-bit
+  - fluent-bit
 
 write_files:
-  - path: /opt/td-agent-bit/scripts/append_tag.lua
-    content: |
-      function append_tag(tag, timestamp, record)
-          new_record = record
-          new_record["tag"] = tag
-          return 1, timestamp, new_record
-      end
-    permissions: '0755'
+  - path: /etc/fluent-bit/identity
+    permissions: '0640'
     owner: 'root:root'
-  - path: /etc/td-agent-bit/my.conf
     content: |
-      @SET OU=makerun
-      [SERVICE]
-          flush           5
-          daemon          Off
-          log_level       info
-          parsers_file    parsers.conf
-          plugins_file    plugins.conf
-          http_server     Off
-          http_listen     0.0.0.0
-          http_port       2020
-          storage.metrics on
+      OU=makerun
+  - path: /etc/fluent-bit/inputs.d/example.conf
+    permissions: '0640'
+    owner: 'root:root'
+    content: |
       [INPUT]
           name     tail
           parser   isotimestamp-singleline
@@ -72,6 +69,10 @@ write_files:
           path     /tmp/test.log
           db       /tmp/fluentbit.db
           path_key source
+  - path: /etc/fluent-bit/filters.d/kafka_tagging.conf
+    permissions: '0640'
+    owner: 'root:root'
+    content: |
       [FILTER]
           name  rewrite_tag
           match app.*
@@ -79,8 +80,23 @@ write_files:
       [FILTER]
           name   lua
           match  out.*
-          script /opt/td-agent-bit/scripts/append_tag.lua
+          script /opt/fluent-bit/bin/append_tag.lua
           call   append_tag
+  - path: /etc/fluent-bit/parsers.d/isotime-singleline.conf
+    permissions: '0640'
+    owner: 'root:root'
+    content: |
+      [PARSER]
+          Name isotimestamp-singleline
+          Format regex
+          Regex ^(?<time>\S+) (?<log>.*)
+          Time_Key    time
+          Time_Format %Y-%m-%dT%H:%M:%S.%L%z
+          Time_Keep   On
+  - path: /etc/fluent-bit/outputs.d/to_kafka.conf
+    permissions: '0640'
+    owner: 'root:root'
+    content: |
       [OUTPUT]
           name                          kafka
           match                         out.*
@@ -93,5 +109,4 @@ write_files:
           rdkafka.request.required.acks 1
           rdkafka.log.connection.close  false
           rdkafka.compression.codec     none
-    permissions: '0640'
-    owner: 'root:root'
+
