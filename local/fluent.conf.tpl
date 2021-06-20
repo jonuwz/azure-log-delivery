@@ -23,6 +23,7 @@
     splunk_index $${tag_parts[2]}
     splunk_host $${tag_parts[4]}
     splunk_sourcetype $${tag_parts[3]}
+    fluent_worker "#{ENV['WORKER']}"
   </record>
 </filter>
 <match out.**>
@@ -36,6 +37,9 @@
   sourcetype_key splunk_sourcetype
   host_key splunk_host
   time_key "@timestamp"
+  <fields>
+    fluent_worker
+  </fields>
   <format **>
     @type single_value
     message_key log
