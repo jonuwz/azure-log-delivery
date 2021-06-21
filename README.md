@@ -27,6 +27,8 @@ where `node_count` is the number of VMs you need want to spin up.
 A file called fluent.conf will be created in the local directory that can be used to load the data into splunk.  
 You will probably need to modify `local/fluent.conf.tpl` to alter the splunk location + token variables.
 
+** AS WITH ALL CLOUD THINGS, REMEMBER TO SHUT DOWN THINGS YOU SPUN UP **
+
 ## Dependencies
 
 The official `td-agent-bit` (fluent-bit) repositories lack the ability to do `SASL_SSL` communications to azure eventhubs.  
