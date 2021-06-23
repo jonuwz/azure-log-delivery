@@ -51,6 +51,7 @@ apt:
         
 packages:
   - fluent-bit
+  - python2-minimal
 
 write_files:
   - path: /etc/fluent-bit/identity
