@@ -32,16 +32,29 @@ output "EVENTHUB_LOCATION" {
   value = "${azurerm_eventhub_namespace.ehns.name}.servicebus.windows.net:9093"
 }
 
-resource "local_file" "fluent_conf" {
-  content = "${data.template_file.fluent_config.rendered}"
-  filename = "../renders/fluent.conf"
-}
-
-data "template_file" "fluent_config" {
+data "template_file" "fluent_conf" {
   template = file("../templates/fluent.conf.tpl")
   vars = {
     eventhubNS = "${azurerm_eventhub_namespace.ehns.name}"
     connectionString = "${azurerm_eventhub_namespace.ehns.default_primary_connection_string}"
   }
+}
+
+resource "local_file" "fluent_conf" {
+  content = "${data.template_file.fluent_conf.rendered}"
+  filename = "../renders/fluent.conf"
+}
+
+data "template_file" "fluent_debug_conf" {
+  template = file("../templates/fluent.debug.conf.tpl")
+  vars = {
+    eventhubNS = "${azurerm_eventhub_namespace.ehns.name}"
+    connectionString = "${azurerm_eventhub_namespace.ehns.default_primary_connection_string}"
+  }
+}
+
+resource "local_file" "fluent_debug_conf" {
+  content = "${data.template_file.fluent_debug_conf.rendered}"
+  filename = "../renders/fluent.debug.conf"
 }
 

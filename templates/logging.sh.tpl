@@ -15,7 +15,7 @@ get_sas_token() {
     local HASH=$(echo -n "$UTF8_SIGNATURE" | openssl sha256 -hmac $SHARED_ACCESS_KEY -binary | base64)
     local ENCODED_HASH=$(echo -n $HASH | jq -s -R -r @uri)
 
-    echo -n "$EVENTHUB_URI?sr=$ENCODED_URI&sig=$ENCODED_HASH&se=$TTL&skn=$SHARED_ACCESS_KEY_NAME"
+    echo -n "$EVENTHUB_URI?sr=$ENCODED_URI\&sig=$ENCODED_HASH\&se=$TTL\&skn=$SHARED_ACCESS_KEY_NAME"
 }
 
 sltok="$(get_sas_token)"
