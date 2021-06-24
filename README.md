@@ -33,3 +33,31 @@ You will probably need to modify `local/fluent.conf.tpl` to alter the splunk loc
 
 The official `td-agent-bit` (fluent-bit) repositories lack the ability to do `SASL_SSL` communications to azure eventhubs.  
 As a convenience, there's a recompiled binary hosted in a deb repository at make.run/repo 
+
+# Alternatives
+
+You can use the azure diagnostics extension to forward arbitrary files to an event hub.  
+While the [documentation](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/diagnostics-extension-overview) says  
+```
+The Azure Diagnostic extension for both Windows and Linux always collect data into an Azure Storage account
+```
+
+This doesnt seem to be true for not true for [fileLogs](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?toc=%2Fazure%2Fazure-monitor%2Ftoc.json&tabs=azcli#filelogs). Just specifying an eventhub sink with no table option, just forwards the log contents to the eventhub.
+
+## Implementation
+
+You need to hand craft the configuration settings of the diagnostics extension. There are samples in the [documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?tabs=azcli).  
+This repository creates the necessary protected and public json files needed to configure a VM.  
+  
+The helper script renders/logging.sh <hostname>, will create the eventhub sasURL, and configure the VM.  
+
+We monitor the file called /tmp/john.log, which is written to on VM boot.
+  
+## Under the hoods
+
+This is all based on fluentd, which runs as the `omsagent` binary on the guest OS.
+The syslog and file monitoring directives create fluentd config under the /etc/opt/microsoft directory.  
+Fluentd contains an Azure [fluentd output plugin](https://github.com/Azure/fluentd-plugin-mdsd) that sends messages to the local msds agent on the guest OS.  
+The msds agent is responsible for actually sending the messages to storage and/or eventhubs.  
+  
+The msds agent looks at the tags in each message received from the omsagent and routes the messages accordingly.
