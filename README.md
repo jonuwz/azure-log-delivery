@@ -46,7 +46,8 @@ This doesnt seem to be true for not true for [fileLogs](https://docs.microsoft.c
 
 ## Implementation
 
-You need to hand craft the configuration settings of the diagnostics extension. There are samples in the [documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?tabs=azcli).  
+You need to hand craft the configuration settings of the diagnostics extension.  
+There are samples in the [documentation](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/diagnostics-linux?tabs=azcli).  
 This repository creates the necessary protected and public json files needed to configure a VM.  
   
 The helper script renders/logging.sh <hostname>, will create the eventhub sasURL, and configure the VM.  
@@ -57,7 +58,7 @@ We monitor the file called /tmp/john.log, which is written to on VM boot.
 
 This is all based on fluentd, which runs as the `omsagent` binary on the guest OS.
 The syslog and file monitoring directives create fluentd config under the /etc/opt/microsoft directory.  
-Fluentd contains an Azure [fluentd output plugin](https://github.com/Azure/fluentd-plugin-mdsd) that sends messages to the local msds agent on the guest OS.  
-The msds agent is responsible for actually sending the messages to storage and/or eventhubs.  
+Fluentd contains an Azure [fluentd output plugin](https://github.com/Azure/fluentd-plugin-mdsd) that sends messages to the local mdsd agent on the guest OS.  
+The mdsd agent is responsible for actually sending the messages to storage and/or eventhubs.  
   
-The msds agent looks at the tags in each message received from the omsagent and routes the messages accordingly.
+The mdsd agent looks at the tags in each message received from the omsagent and routes the messages accordingly.
