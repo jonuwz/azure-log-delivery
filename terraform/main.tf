@@ -1,6 +1,6 @@
 variable "prefix" { default = "tf" }
 variable "location" { default = "eastus2" }
-variable "node_count" { default = 2 }
+variable "node_count" { default = 1 }
 
 terraform {
   required_providers {
@@ -34,11 +34,11 @@ output "EVENTHUB_LOCATION" {
 
 resource "local_file" "fluent_conf" {
   content = "${data.template_file.fluent_config.rendered}"
-  filename = "../local/fluent.conf"
+  filename = "../renders/fluent.conf"
 }
 
 data "template_file" "fluent_config" {
-  template = file("../local/fluent.conf.tpl")
+  template = file("../templates/fluent.conf.tpl")
   vars = {
     eventhubNS = "${azurerm_eventhub_namespace.ehns.name}"
     connectionString = "${azurerm_eventhub_namespace.ehns.default_primary_connection_string}"

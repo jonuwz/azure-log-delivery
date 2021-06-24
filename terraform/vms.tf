@@ -103,5 +103,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
         storage_account_uri = azurerm_storage_account.storage.primary_blob_endpoint
     }
 
+    identity {
+        type = "SystemAssigned"
+    }
+
     custom_data = data.template_cloudinit_config.config.rendered
 }
