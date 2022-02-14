@@ -21,6 +21,7 @@
           "resourceId": "__VM_RESOURCE_ID__"
         }, 
         "performanceCounters": {
+          "sinks":"EHforSyslog",
           "performanceCounterConfiguration": [
             {
               "annotation": [
