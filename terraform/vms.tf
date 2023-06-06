@@ -99,15 +99,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
         public_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOlY9F0gLlOTPvf5XrAiXH+qGdtrNuEL6Lbd+I1TFTzpci97ozzZksJ/6GvBnC/iX1WObibQBGZNdDdnD7041kbwnfgxNn9gC/EckNgRSmMmVFN/7QkPVclcCgBDqMeKo/r7k8PZFHi8cEUeJX71Bzac4cnRgN5jQY/cp6+MN+CcN44xyP1Lubjv+tfKmfLU7wzOLVcV6TnywpCPSC/yDAVfzhy/usNxlLnejtChhAuy98v1ibKkpWXKd3LbKvl2CHDA464dHvLS7zyoB/wOfjBgCXYkjWhq+lUE/EVDAhlp5k8+HGRmGY5mcB8wvUUvZw1wfy3NyR0pf3n6G1nA5B"
     }
 
-    boot_diagnostics {
-        storage_account_uri = azurerm_storage_account.storage.primary_blob_endpoint
-    }
-
     identity {
         type = "SystemAssigned"
     }
 
-    custom_data = data.template_cloudinit_config.config.rendered
 }
 
 resource "azurerm_virtual_machine_extension" "monitoragent" {

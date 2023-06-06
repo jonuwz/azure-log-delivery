@@ -1,5 +1,5 @@
 data "template_file" "dcr" {
-  template = file("dcr.tpl")
+  template = file("../templates/dcr.tpl")
   vars = {
     name = "${random_string.name.result}"
     location = azurerm_resource_group.rg.location
@@ -25,7 +25,7 @@ EOC
 
 
 data "template_file" "dcra" {
-  template = file("dcra.tpl")
+  template = file("../templates/dcra.tpl")
   vars = {
     data_collection_rule = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${azurerm_resource_group.rg.name}/providers/Microsoft.Insights/dataCollectionRules/linux-vms"
   }
@@ -46,4 +46,6 @@ EOC
   triggers = {
     data = md5(data.template_file.dcra.rendered)
   }
+
+  depends_on = [ null_resource.data_collection_rule ]
 }
