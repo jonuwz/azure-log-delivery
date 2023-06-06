@@ -75,7 +75,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     location              = azurerm_resource_group.rg.location
     resource_group_name   = azurerm_resource_group.rg.name
     network_interface_ids = ["${element(azurerm_network_interface.nic.*.id,count.index)}"]
-    size                  = "Standard_DS1_v2"
+    size                  = "Standard_B1s"
 
     os_disk {
         name              = "${var.prefix}-vm-disk-${count.index}"
@@ -84,9 +84,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
 
     source_image_reference {
-        publisher = "Canonical"
-        offer     = "0001-com-ubuntu-server-focal"
-        sku       = "20_04-lts"
+        publisher = "RedHat"
+        offer     = "RHEL"
+        sku       = "8"
         version   = "latest"
     }
 
@@ -108,4 +108,13 @@ resource "azurerm_linux_virtual_machine" "vm" {
     }
 
     custom_data = data.template_cloudinit_config.config.rendered
+}
+
+resource "azurerm_virtual_machine_extension" "monitoragent" {
+  count                = "${var.node_count}"
+  name                 = "${var.prefix}-monitoragent-${count.index}"
+  virtual_machine_id   = "${element(azurerm_linux_virtual_machine.vm.*.id,count.index)}"
+  publisher            = "Microsoft.Azure.Monitor"
+  type                 = "AzureMonitorLinuxAgent"
+  type_handler_version = "1.15"
 }

@@ -2,11 +2,13 @@ variable "prefix" { default = "tf" }
 variable "location" { default = "eastus2" }
 variable "node_count" { default = 1 }
 
+data "azurerm_client_config" "current" {}
+
 terraform {
   required_providers {
     azurerm = {
       source = "hashicorp/azurerm"
-      version = ">= 2.26"
+      version = "=3.59.0"
     }
   }
 
