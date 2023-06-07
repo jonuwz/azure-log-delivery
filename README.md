@@ -1,16 +1,18 @@
 # azure-log-delivery
   
 This is an example of how to get logs out of azure virtual machines, via Azure monitor, log analytics export rules, eventhubs, collected by fluentd, and into splunk.  
+  
+When you spin this up, you'll need to wait ~ 5-10 minutes before your 1st logs are available to stream.
 
 ## How ?
 
-Using terraform, we create a datacollection rule that grabs syslog events and sends them to loganalytics.
-The VMs have the Azure monitor Agent installed as an extension
-There's a data export rule on the loganalytics workspace that dumps the syslog table to an eventhub.
-
+Using terraform, we create a datacollection rule that grabs syslog events and sends them to loganalytics.  
+The VMs have the Azure monitor Agent installed as an extension.  
+There's a data export rule on the loganalytics workspace that dumps the syslog table to an eventhub.  
+  
 On the other end, terraform spits out a local file that can be used by fluentd to fetch the data from the eventhub topics.  
-Fluent inserts data into splunk using HEC.
-
+Fluent inserts data into splunk using HEC.  
+  
 Rather than use fluentd, you could use splunks add-ons to pull directly from the eventhub. Fluentd is easier to demo.
   
 ## Usage 
