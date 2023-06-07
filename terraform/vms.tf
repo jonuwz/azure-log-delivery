@@ -111,5 +111,13 @@ resource "azurerm_virtual_machine_extension" "monitoragent" {
   virtual_machine_id   = "${element(azurerm_linux_virtual_machine.vm.*.id,count.index)}"
   publisher            = "Microsoft.Azure.Monitor"
   type                 = "AzureMonitorLinuxAgent"
-  type_handler_version = "1.15"
+  type_handler_version = "1.21"
+}
+
+resource "azurerm_monitor_data_collection_rule_association" "dcra" {
+  count                   = "${var.node_count}"
+  name                    = "${var.prefix}-dcra-${count.index}"
+  target_resource_id      = "${element(azurerm_linux_virtual_machine.vm.*.id,count.index)}"
+  data_collection_rule_id = azurerm_monitor_data_collection_rule.dcr.id
+  description             = "example"
 }

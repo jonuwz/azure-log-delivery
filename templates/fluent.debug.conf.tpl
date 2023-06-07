@@ -5,10 +5,14 @@
   ssl_ca_certs_from_system true
   username $ConnectionString
   password "${connectionString}"
-  topics /app_.*/
+  topics /.*/
   format json
   add_prefix kafka
 </source>
+<filter kafka.**>
+  @type split_array
+  split_key records
+</filter>
 <match **>
   @type stdout
 </match>
